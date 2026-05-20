@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Content Engineering — An Interactive Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4EFE6;
+    --bg-elevated: #FDFAF3;
+    --bg-sidebar: #EDE6D6;
+    --ink: #1C1917;
+    --ink-soft: #57534E;
+    --ink-faint: #A8A29E;
+    --accent: #9F1239;
+    --accent-hover: #881337;
+    --accent-soft: #FECDD3;
+    --rule: #DDD3BD;
+    --rule-soft: #E7E1D4;
+    --complete: #15803D;
+    --code-bg: #2A2724;
+    --code-ink: #F4EFE6;
+    --highlight: #FEF3C7;
+    --shadow-soft: 0 1px 2px rgba(28,25,23,.04), 0 4px 16px rgba(28,25,23,.06);
+    --shadow-strong: 0 4px 16px rgba(28,25,23,.08), 0 12px 32px rgba(28,25,23,.10);
+
+    --font-display: "Fraunces", "Iowan Old Style", "Palatino", "Baskerville", Georgia, serif;
+    --font-body: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", Consolas, ui-monospace, monospace;
+
+    --sidebar-w: 320px;
+    --content-w: 720px;
+    --ease: cubic-bezier(.4, 0, .2, 1);
+  }
+
+  [data-theme="dark"] {
+    --bg: #1A1817;
+    --bg-elevated: #242220;
+    --bg-sidebar: #14110F;
+    --ink: #F4EFE6;
+    --ink-soft: #C7B299;
+    --ink-faint: #78706A;
+    --accent: #FB7185;
+    --accent-hover: #F472B6;
+    --accent-soft: #4C1D2F;
+    --rule: #3A3530;
+    --rule-soft: #2A2724;
+    --complete: #4ADE80;
+    --code-bg: #0E0C0B;
+    --code-ink: #F4EFE6;
+    --highlight: #44340A;
+    --shadow-soft: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    --shadow-strong: 0 4px 16px rgba(0,0,0,.5), 0 12px 32px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color .3s var(--ease), color .3s var(--ease);
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  /* Layout */
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--rule);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    padding: 28px 0;
+    transition: transform .3s var(--ease);
+  }
+
+  .sidebar::-webkit-scrollbar { width: 8px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+  .sidebar::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+  .brand {
+    padding: 0 28px 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 20px;
+  }
+
+  .brand-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .brand-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    font-style: italic;
+  }
+
+  .brand-title em {
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .progress-summary {
+    padding: 0 28px 20px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 20px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .progress-label-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .progress-label-pct {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--accent);
+    font-feature-settings: "tnum";
+  }
+
+  .progress-track {
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width .5s var(--ease);
+    border-radius: 2px;
+  }
+
+  .nav-section {
+    margin-bottom: 8px;
+  }
+
+  .nav-section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 8px 28px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 28px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    transition: background .15s var(--ease), color .15s var(--ease);
+    position: relative;
+  }
+
+  .nav-item:hover {
+    background: var(--bg-elevated);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    background: var(--bg-elevated);
+    color: var(--ink);
+  }
+
+  .nav-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+  }
+
+  .nav-item-number {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 24px;
+    padding-top: 2px;
+    font-feature-settings: "tnum";
+  }
+
+  .nav-item-title {
+    flex: 1;
+    padding-right: 8px;
+  }
+
+  .nav-item-check {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    flex-shrink: 0;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s var(--ease);
+  }
+
+  .nav-item.complete .nav-item-check {
+    background: var(--complete);
+    border-color: var(--complete);
+  }
+
+  .nav-item.complete .nav-item-check::after {
+    content: "";
+    width: 4px;
+    height: 7px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .nav-item.complete .nav-item-title {
+    color: var(--ink-faint);
+  }
+
+  .sidebar-footer {
+    padding: 20px 28px;
+    border-top: 1px solid var(--rule);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .util-btn {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 12px;
+    transition: all .15s var(--ease);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .util-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--ink);
+    border-color: var(--ink-soft);
+  }
+
+  /* Main */
+  .main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .topbar {
+    height: 60px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+
+  .topbar-left {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .topbar-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s var(--ease);
+  }
+
+  .icon-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--ink);
+    border-color: var(--ink-soft);
+  }
+
+  .menu-btn { display: none; }
+
+  /* Lesson */
+  .lesson-container {
+    flex: 1;
+    padding: 56px 48px 80px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .lesson {
+    max-width: var(--content-w);
+    margin: 0 auto;
+    animation: fadeUp .5s var(--ease);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .lesson-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lesson-meta-rule {
+    height: 1px;
+    width: 32px;
+    background: var(--accent);
+  }
+
+  h1.lesson-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    margin-bottom: 24px;
+    font-feature-settings: "ss01";
+  }
+
+  .lesson-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .lesson-intro {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-weight: 300;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    font-style: italic;
+  }
+
+  h2.section-head {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 32px;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 48px 0 20px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    position: relative;
+  }
+
+  h2.section-head:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  h2.section-head .head-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  h3.subsection {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    margin: 32px 0 14px;
+    line-height: 1.3;
+    letter-spacing: -.005em;
+  }
+
+  h4.minor-head {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 28px 0 12px;
+  }
+
+  .prose p {
+    font-size: 17px;
+    line-height: 1.65;
+    margin-bottom: 18px;
+    color: var(--ink);
+  }
+
+  .prose p.lead {
+    font-size: 19px;
+    color: var(--ink-soft);
+  }
+
+  .prose strong { font-weight: 600; color: var(--ink); }
+  .prose em { font-style: italic; }
+
+  .prose ul, .prose ol {
+    margin: 8px 0 24px 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .prose ul li, .prose ol li {
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    padding-left: 28px;
+    position: relative;
+  }
+
+  .prose ul li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .prose ol {
+    counter-reset: ol-counter;
+  }
+
+  .prose ol li {
+    counter-increment: ol-counter;
+  }
+
+  .prose ol li::before {
+    content: counter(ol-counter, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    top: 2px;
+  }
+
+  .prose a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color .15s var(--ease);
+  }
+
+  .prose a:hover { color: var(--accent-hover); }
+
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: .88em;
+    background: var(--rule-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .prose pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    border: 1px solid var(--rule);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .prose pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 400;
+  }
+
+  .prose blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 24px;
+    margin: 24px 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .prose blockquote p {
+    margin-bottom: 12px;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .prose blockquote p:last-child { margin-bottom: 0; }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .prose th {
+    text-align: left;
+    padding: 12px 16px 12px 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--accent);
+    font-weight: 500;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .prose td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .prose tr:last-child td { border-bottom: none; }
+
+  /* Scenario callout */
+  .scenario {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--accent);
+    padding: 28px 32px;
+    margin: 24px 0;
+    border-radius: 0 8px 8px 0;
+    position: relative;
+  }
+
+  .scenario-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .scenario-label::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .scenario p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .scenario p:last-child { margin-bottom: 0; }
+
+  /* Activity */
+  .activity {
+    background: var(--bg-elevated);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 32px;
+    margin: 32px 0;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .activity-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .activity-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .activity-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .activity-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+    padding-top: 8px;
+    letter-spacing: .05em;
+  }
+
+  .save-indicator {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    transition: background .3s var(--ease);
+  }
+
+  .save-indicator.saved {
+    background: var(--complete);
+  }
+
+  .save-indicator.saving {
+    background: var(--accent);
+    animation: pulse 1s var(--ease) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+  }
+
+  .activity-prompt {
+    margin-bottom: 20px;
+  }
+
+  .activity-prompt p,
+  .activity-prompt ul,
+  .activity-prompt ol {
+    color: var(--ink);
+  }
+
+  .activity-workspace {
+    margin-top: 20px;
+  }
+
+  .workspace-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .word-count {
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .workspace-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 16px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    resize: vertical;
+    transition: border-color .15s var(--ease);
+  }
+
+  .workspace-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .workspace-textarea::placeholder {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  /* Self-check */
+  .selfcheck {
+    background: var(--bg-elevated);
+    border: 1px dashed var(--rule);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin: 32px 0;
+  }
+
+  .selfcheck-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .selfcheck-question {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+  }
+
+  .selfcheck-question:last-child { border-bottom: none; }
+
+  .selfcheck-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s var(--ease);
+  }
+
+  .selfcheck-question.checked .selfcheck-checkbox {
+    background: var(--complete);
+    border-color: var(--complete);
+  }
+
+  .selfcheck-question.checked .selfcheck-checkbox::after {
+    content: "";
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .selfcheck-question.checked .selfcheck-text {
+    color: var(--ink-faint);
+    text-decoration: line-through;
+    text-decoration-color: var(--ink-faint);
+  }
+
+  .selfcheck-text {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.5;
+    transition: color .15s var(--ease);
+  }
+
+  /* Apply callout */
+  .apply-callout {
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, transparent 100%);
+    border-top: 1px solid var(--accent);
+    padding: 24px 0 0 0;
+    margin: 32px 0;
+  }
+
+  .apply-callout-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .apply-callout p {
+    font-family: var(--font-display);
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink);
+    font-style: italic;
+  }
+
+  /* Complete CTA */
+  .complete-cta {
+    margin: 64px 0 24px;
+    padding: 32px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--bg-elevated);
+    text-align: center;
+  }
+
+  .complete-cta-text {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .btn-complete {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: .02em;
+    transition: all .15s var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-complete:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .btn-complete.is-complete {
+    background: var(--complete);
+  }
+
+  .btn-complete.is-complete:hover {
+    background: var(--complete);
+    transform: none;
+  }
+
+  /* Lesson nav */
+  .lesson-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .nav-link {
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 16px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--ink);
+    text-align: left;
+    flex: 1;
+    max-width: 280px;
+    transition: all .15s var(--ease);
+    font-family: var(--font-body);
+  }
+
+  .nav-link:hover:not(:disabled) {
+    background: var(--bg-elevated);
+    border-color: var(--ink-soft);
+    transform: translateY(-1px);
+  }
+
+  .nav-link:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  .nav-link.next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .nav-link-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+
+  .nav-link-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  /* Mobile */
+  .scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 19;
+  }
+
+  @media (max-width: 900px) {
+    .app {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: 320px;
+      max-width: 88vw;
+      z-index: 20;
+      transform: translateX(-100%);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar.open ~ .scrim,
+    .scrim.show {
+      display: block;
+    }
+
+    .menu-btn { display: flex; }
+
+    .topbar {
+      padding: 0 24px;
+    }
+
+    .lesson-container {
+      padding: 32px 24px 64px;
+    }
+
+    h1.lesson-title { font-size: 36px; }
+    h2.section-head { font-size: 26px; }
+    h3.subsection { font-size: 19px; }
+
+    .activity, .selfcheck { padding: 24px 20px; }
+    .scenario { padding: 24px 20px; }
+
+    .lesson-nav { flex-direction: column; }
+    .nav-link.next { margin-left: 0; }
+  }
+
+  /* Print styles */
+  @media print {
+    .sidebar, .topbar, .lesson-nav, .complete-cta { display: none; }
+    .app { grid-template-columns: 1fr; }
+    .lesson-container { padding: 0; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    box-shadow: var(--shadow-strong);
+    z-index: 50;
+    transition: transform .3s var(--ease);
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-eyebrow">A course in 11 modules</div>
+      <div class="brand-title">From Content Designer<br>to <em>Content Engineer</em></div>
+    </div>
+
+    <div class="progress-summary">
+      <div class="progress-label">
+        <span class="progress-label-text">Progress</span>
+        <span class="progress-label-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <nav id="nav-list"></nav>
+
+    <div class="sidebar-footer">
+      <button class="util-btn" onclick="exportProgress()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export my work
+      </button>
+      <button class="util-btn" onclick="resetProgress()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Reset progress
+      </button>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim" onclick="closeSidebar()"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" onclick="openSidebar()" aria-label="Open menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-left" id="topbar-current">Module 0</div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme" id="theme-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="lesson-container">
+      <article class="lesson" id="lesson"></article>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   COURSE DATA
+   ============================================================ */
+const courseData = [
+  {
+    id: "intro",
+    section: "Getting started",
+    number: "00",
+    title: "Welcome to the course",
+    intro: "A short orientation before you begin — what's in here, how it works, and how to get the most out of it.",
+    sections: [
+      { type: "head", text: "Who this is for" },
+      { type: "prose", html: `<p class="lead">Content designers, UX writers, and content strategists who want to move into a content engineering role — or who want to bring engineering-grade rigor to the content they already produce.</p>` },
+
+      { type: "head", text: "What you'll have at the end" },
+      { type: "prose", html: `<p>A working content model in a headless CMS, a small front-end that consumes it via API, a documented taxonomy, an LLM-ready content set, and a portfolio capstone you can show in interviews.</p><p>Time commitment is roughly 30–40 hours total. Each module is self-contained — do one a week or binge a few in a weekend.</p>` },
+
+      { type: "head", text: "How each module works" },
+      { type: "prose", html: `<p>Every module follows the same structure:</p>
+        <ol>
+          <li><strong>The shift</strong> — what changes in your thinking compared to traditional content design</li>
+          <li><strong>Concepts</strong> — the technical vocabulary and ideas</li>
+          <li><strong>Real-world scenario</strong> — a situation you'll plausibly hit at work</li>
+          <li><strong>Activity</strong> — something you actually build or do, with deliverables</li>
+          <li><strong>Apply it at work</strong> — how to bring the lesson into your current role this week</li>
+          <li><strong>Self-check</strong> — questions to confirm you've internalized it</li>
+        </ol>
+        <p><strong>Don't skip the activities.</strong> Reading about content modeling is like reading about swimming. The transition into engineering happens at your fingertips, not in your head.</p>` },
+
+      { type: "head", text: "How this interactive site works" },
+      { type: "prose", html: `<ul>
+        <li><strong>Your progress saves automatically</strong> in your browser. Close the tab and come back whenever you want.</li>
+        <li><strong>Activity answers persist too.</strong> What you type into the activity workspaces is saved as you go. A small indicator shows when it's saved.</li>
+        <li><strong>Export your work anytime.</strong> Click "Export my work" in the sidebar to download all your activity responses as a Markdown file. Do this regularly as a backup — browser storage is not bulletproof.</li>
+        <li><strong>Mark each module complete</strong> when you've internalized it. This drives the progress bar and helps you keep track.</li>
+        <li><strong>Works offline.</strong> Once this file is downloaded, no internet connection is needed.</li>
+      </ul>` }
+    ]
+  },
+
+  {
+    id: "m1",
+    section: "Module 1",
+    number: "01",
+    title: "What Content Engineering Actually Is",
+    intro: "Content designers think about the words on a screen. Content engineers think about the systems that produce, store, and deliver those words to any screen, any device, any AI, any language, at any scale.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>A content designer asks: <em>"What should this button say?"</em></p>
+        <p>A content engineer asks: <em>"How is button-label content modeled, where does it live, how is it versioned, how is it translated, how is it served, and how does a designer change it without a developer's help?"</em></p>
+        <p>Both roles care about the user. The engineer's user is broader: the writer, the translator, the developer, the AI model, and ultimately the reader.</p>` },
+
+      { type: "head", text: "Concepts to learn", num: "II" },
+      { type: "prose", html: `<ul>
+        <li><strong>Content as data, not pages.</strong> A product description isn't a paragraph on a page — it's a structured record with a name, price, features list, an image reference, and a locale. The page is one of many possible renderings.</li>
+        <li><strong>Separation of content and presentation.</strong> The same content record can render as a webpage, an email, a voice assistant reply, an Apple Watch notification, or an LLM context chunk.</li>
+        <li><strong>Single source of truth.</strong> Every piece of content should live in exactly one place and flow outward to every channel.</li>
+        <li><strong>Authoring experience (AX).</strong> Engineers care about the experience of the people creating content as much as designers care about the experience of the people consuming it.</li>
+      </ul>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your fintech product shows "Your session has expired" when users get logged out. A compliance audit turns up 12 variants of this message in production: "Session expired", "Your secure session has timed out", "For your protection, you've been signed out", and so on. Accessibility flags three for failing WCAG (too vague for screen readers). Legal flags one for using "secure" without qualification. You're asked to "fix the copy."</p>
+        <p><strong>The content designer's instinct:</strong> rewrite each variant.</p>
+        <p><strong>The content engineer's instinct:</strong> ask why one string lives in 12 places. Propose a session-timeout content pattern in the design system: one canonical message, accessibility-tested, with a process that stops the next 12 variants from drifting in.</p>` },
+
+      { type: "activity", id: "1.1", title: "The 'where does it live' audit", prompt: `<p>Pick your product (or any product you know well). List 5 pieces of UI content that probably appear in more than one place — for example, an error message, an empty state CTA, a session-timeout warning, a regulatory disclosure, a confirmation modal heading, or a notification.</p>
+        <p>For each, look across surfaces: the product UI, the help center, in-product onboarding tips, support email templates, push notifications, the marketing site.</p>
+        <table>
+          <thead><tr><th>Content</th><th>Surface 1</th><th>Surface 2</th><th>Surface 3</th><th>Single source?</th><th>Who updates?</th></tr></thead>
+          <tbody><tr><td>"Your session has expired"</td><td>Web app modal</td><td>Mobile app banner</td><td>Help center article</td><td>No</td><td>Product, mobile, support — separately</td></tr></tbody>
+        </table>
+        <p>You'll almost certainly find that "single source?" is "No" for most rows. Save this — it's the seed of every conversation you'll have as a content engineer.</p>`,
+        placeholder: "Product I'm auditing —\n\n1. [string] appears on [UI screen], [help article], [email template]. Single source: ...\n2. ..." },
+
+      { type: "apply", html: `<p>In your next content review meeting, when someone asks for a copy change, ask: <em>"Where else does this string appear, and how will those places stay in sync?"</em> You will be the only person in the room asking that question. It is the engineering mindset in one sentence.</p>` },
+
+      { type: "selfcheck", questions: [
+        "Can you explain the difference between 'content' and 'a page' to a non-technical colleague?",
+        "Can you name three surfaces in your product that probably contain duplicated content?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m2",
+    section: "Module 2",
+    number: "02",
+    title: "Structured Content Fundamentals",
+    intro: "You stop writing documents and start writing records.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>A document is "About Us — a 400-word paragraph."</p>
+        <p>A record is <code>{ companyName, foundedYear, mission, headquartersCity, teamSize, ceoQuote }</code> — fields with types and rules, which a template assembles into the About Us page, the press kit, the LinkedIn bio, and the chatbot's company FAQ.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "prose", html: `<p><strong>Unstructured content</strong> is a blob — a Word document, a Google Doc, a body of HTML. A computer can display it but can't reason about it.</p>
+        <p><strong>Semi-structured content</strong> has some shape — Markdown with frontmatter, a doc with consistent headings.</p>
+        <p><strong>Structured content</strong> has a defined schema — every record of a type has the same fields, each field has a type (string, number, image, reference, date), and the system can validate, query, and transform it.</p>` },
+
+      { type: "minor", text: "The key vocabulary" },
+      { type: "prose", html: `<ul>
+        <li><strong>Content type</strong> — a category of content (Article, Author, Product, Event). Sometimes called a "model."</li>
+        <li><strong>Field</strong> — a property of a content type (title, body, author, publishedAt).</li>
+        <li><strong>Type</strong> — what kind of value a field accepts (short text, long text, integer, boolean, reference, image, datetime).</li>
+        <li><strong>Validation</strong> — rules a field's value must follow (max 60 characters, must be unique, must match an email pattern).</li>
+        <li><strong>Reference</strong> — a pointer from one record to another (an Article <em>references</em> an Author).</li>
+        <li><strong>Entry / record / item</strong> — a single instance of a content type (the article "How we built our search").</li>
+      </ul>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your team wants to launch a Help Center for a fintech product. The PM says "let's just dump articles into a CMS." You, the new content engineer, raise your hand.</p>
+        <p>Articles need: a title (max 80 chars), a slug (URL-safe, unique), an excerpt (max 160 chars), a body, a primary category, optional sub-tags, related-articles references (up to 4), an author reference, a "last reviewed by" reference (must be someone on the compliance team for any article touching regulated topics), a "last reviewed at" date (auto-prompts re-review after 6 months), an applicable-regions field (some articles are only legal in certain jurisdictions), a status (draft / in legal review / published / needs-update), and a content-sensitivity flag (some articles trigger an extra approval workflow).</p>
+        <p>What looked like "just articles" is actually a content type with 12+ fields, three references, two enums, validation rules, and a compliance workflow. <strong>That's the engineering work.</strong> Without it, writers produce inconsistent content, audits fail, articles quietly drift out of regulatory compliance, and the company has no system answer to "show me all articles a compliance officer needs to re-review."</p>` },
+
+      { type: "activity", id: "2.1", title: "Model a content type from scratch", prompt: `<p>Take one content surface from your real product — pick something close to your daily work as a content designer:</p>
+        <ul>
+          <li>An <strong>error message</strong> pattern in your design system</li>
+          <li>An <strong>empty state</strong> (e.g., "No transactions yet")</li>
+          <li>An <strong>onboarding tooltip / coachmark</strong></li>
+          <li>An <strong>in-app notification / banner</strong> pattern</li>
+          <li>A <strong>transactional email</strong> (e.g., "Your transfer was completed")</li>
+          <li>A <strong>help article</strong> in your support center</li>
+          <li>A <strong>regulatory disclosure</strong> shown at a specific step (KYC, risk warning, terms acceptance)</li>
+        </ul>
+        <p>Write out the full content model. Use this template:</p>
+        <pre><code>CONTENT TYPE: [name]
+PURPOSE: [one sentence — what is this and where does it appear]
+
+FIELDS:
+- fieldName (type, required/optional, validation, notes)
+- ...
+
+REFERENCES:
+- ...
+
+DERIVED / AUTOMATED FIELDS:
+- (e.g., slug auto-generated from title; "last updated" set by system)
+
+LIFECYCLE:
+- (states this content can be in: draft → review → published → archived)</code></pre>
+        <p>Aim for at least 12 fields. If you can't find 12, you're probably leaving content design responsibilities on the floor. Real example fields people forget: SEO title separate from display title, social-share image separate from hero image, "show in navigation" toggle, valid-from / valid-until dates, locale, content owner.</p>`,
+        placeholder: "CONTENT TYPE: \nPURPOSE: \n\nFIELDS:\n- \n- \n- \n\nREFERENCES:\n- \n\nDERIVED FIELDS:\n- \n\nLIFECYCLE:\n- " },
+
+      { type: "apply", html: `<p>Find one piece of content that currently lives as a Google Doc or a Figma annotation in your team. Sketch its structured model. Even if you never move it into a CMS, having the model on paper will change how you brief writers and how you spec out work for engineers.</p>` },
+
+      { type: "selfcheck", questions: [
+        "Without looking, list the difference between a field's type and its validation.",
+        "Why is 'author' usually a reference and not a text field?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m3",
+    section: "Module 3",
+    number: "03",
+    title: "Content Modeling Like an Architect",
+    intro: "A bad content model is the original sin of a content system. It's also the most common one. You're going to be the person who fixes it.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>Most content systems are designed by developers who don't think about content, or by content people who don't think about systems. You're going to be the person who can do both.</p>` },
+
+      { type: "head", text: "Three principles of good content modeling", num: "II" },
+      { type: "prose", html: `<ol>
+        <li><strong>Reflect the domain, not the page.</strong> Don't make a "Homepage" content type with 40 fields. Make a "HeroBlock," a "FeatureGrid," a "Testimonial," a "Product." Compose pages from these blocks. The same Testimonial then appears on the homepage, the pricing page, and an email.</li>
+        <li><strong>Atomic, then composed.</strong> Model the smallest meaningful unit (an Author, an Image-with-credit, an Address). Compose larger types from those atoms (an Article references an Author; a Location uses an Address). This is <strong>content componentization</strong> — the equivalent of design system components.</li>
+        <li><strong>Plan for variants and exceptions early.</strong> The most painful refactors are when you modeled "Product" and then someone adds "Bundle." Or "Article" and then someone needs "Video Article." Ask: what are all the variants of this content that might exist in 18 months?</li>
+      </ol>` },
+
+      { type: "minor", text: "Common modeling mistakes" },
+      { type: "prose", html: `<ul>
+        <li><strong>The God Type:</strong> one content type with 80 fields, half of which are blank on any given entry. ("Page" types are usually this.)</li>
+        <li><strong>Flat structure with no references:</strong> the same author name typed manually on 200 articles. Author changes their byline preference — you update 200 records.</li>
+        <li><strong>Coupling content to layout:</strong> a field called <code>leftColumnText</code> and another called <code>rightColumnText</code>. The day you redesign, you have to migrate every record.</li>
+        <li><strong>No locale awareness:</strong> modeling everything assuming English, then bolting on localization later. It's always painful.</li>
+      </ul>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your healthtech product has a "patient notification" pattern in the design system. Today it's modeled as one content type: title, body, severity. Then product teams start using it for everything: appointment reminders (must follow HIPAA rules around what can be shown on a lock screen), medication alerts (must be acknowledged, not dismissible), promotional updates ("New feature available"), and service status ("App maintenance tonight").</p>
+        <p>Each has different fields, different validation, different approval workflows, different channel constraints. Appointment reminders need a "minimum-PHI" flag. Medication alerts need an acknowledgment record for audit. Promotional notifications need a region filter (some markets prohibit health-app promotional content). Service status needs a start and end time.</p>
+        <p>You realize "patient notification" is actually four content types pretending to be one — and modeling them all the same is causing bugs, compliance risk, and editorial confusion. <strong>The engineering work is naming the differences.</strong></p>` },
+
+      { type: "activity", id: "3.1", title: "Refactor a real content type", prompt: `<p>Take the content type you modeled in Activity 2.1. Now refactor it using the three principles:</p>
+        <ol>
+          <li><strong>Decompose.</strong> Identify any field that is actually a structured sub-thing. ("Author" → reference to Author. "Address" → reference to Address. "Pricing tier" → reference to PricingPlan.)</li>
+          <li><strong>Identify atoms.</strong> What sub-types did you find that other content types in your product might also use?</li>
+          <li><strong>Plan variants.</strong> Write down 2–3 plausible future variants. For each, decide: is this a new content type, or is it the same type with a <code>variant</code> field, or is it the same type with optional fields?</li>
+        </ol>
+        <p>Draw the resulting model as a diagram. Boxes for content types. Arrows for references. Label the arrows with cardinality (one-to-one, one-to-many).</p>`,
+        placeholder: "Starting content type: ...\n\nDecomposed fields:\n- ...\n\nAtoms I extracted:\n- ...\n\nPlausible variants:\n- ..." },
+
+      { type: "activity", id: "3.2", title: "The 'help article is a composition' exercise", prompt: `<p>Take a single help article from your product's help center. Break it down into reusable content blocks. Example for a "How to set up 2FA" article:</p>
+        <ul>
+          <li>1 ArticleHero (title, last-reviewed-at, last-reviewed-by, applicable-regions)</li>
+          <li>1 IntroParagraph (body)</li>
+          <li>3 StepBlocks (heading, body, optional screenshot, optional UI label reference)</li>
+          <li>1 TipCallout — used 0..N times (severity, body)</li>
+          <li>1 RegulatoryDisclosure — used 0..1 times (jurisdiction, body, legal-approval reference)</li>
+          <li>1 RelatedArticles (array of references)</li>
+          <li>1 FeedbackBlock (article ID — for "was this helpful?")</li>
+        </ul>
+        <p>Now imagine the onboarding flow for the same feature. How many of those same blocks does it reuse? StepBlock, TipCallout, and RegulatoryDisclosure probably all show up. That's the leverage: <em>the page becomes a playlist of blocks</em>, and the content stays put.</p>`,
+        placeholder: "Article I'm breaking down: ...\n\nBlocks I identified:\n1. ...\n2. ...\n\nWhich blocks could be reused in onboarding, notifications, or other articles:\n- ..." },
+
+      { type: "apply", html: `<p>Next time someone hands you a Figma design and says "we need copy for this page," ask the designer: <em>which of these elements appear on other pages, and should they share a source?</em> You'll start spotting unstructured-content debt everywhere.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What is the difference between a content type and a page?",
+        "Why is referencing Authors better than typing names into a string field?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m4",
+    section: "Module 4",
+    number: "04",
+    title: "APIs and How Content Flows",
+    intro: "Until now, 'content goes on a page' was a black box. Now you'll open it. APIs are how content moves between systems — and if you can read an API response, you can talk to engineers as a peer.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>Content moves through APIs. APIs are how the CMS hands content to the website, the mobile app, the chatbot, and the export script. If you can read an API response, you can talk to engineers as a peer.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "prose", html: `<p><strong>An API</strong> is a way for one program to ask another for something. The most common kind for content is an HTTP API — your browser is already using dozens right now.</p>` },
+
+      { type: "minor", text: "The mental model" },
+      { type: "prose", html: `<ul>
+        <li>The CMS holds content (a database, more or less).</li>
+        <li>A program (the website, an app, a script) sends a <strong>request</strong> to the CMS's API: "give me article with slug <code>how-to-bake-bread</code>."</li>
+        <li>The API sends back a <strong>response</strong> — usually as <strong>JSON</strong>, which is just structured text.</li>
+        <li>The program reads the JSON and renders the page.</li>
+      </ul>` },
+
+      { type: "minor", text: "JSON in 60 seconds" },
+      { type: "prose", html: `<pre><code>{
+  "title": "How to Bake Bread",
+  "slug": "how-to-bake-bread",
+  "publishedAt": "2025-09-14",
+  "author": {
+    "name": "Mira Kapoor",
+    "role": "Senior Editor"
+  },
+  "tags": ["bread", "baking", "beginner"],
+  "body": "Bread is..."
+}</code></pre>
+        <p>That's it. Curly braces are objects (records). Square brackets are arrays (lists). Keys are field names. Values are strings, numbers, booleans, objects, arrays, or <code>null</code>. The whole web runs on this.</p>` },
+
+      { type: "minor", text: "REST vs GraphQL — the one-sentence version" },
+      { type: "prose", html: `<ul>
+        <li><strong>REST:</strong> you go to a URL like <code>/articles/how-to-bake-bread</code> and the API gives you a fixed JSON shape for that resource.</li>
+        <li><strong>GraphQL:</strong> you go to a single URL and <em>send a query</em> that says "give me exactly these fields and no others." More flexible, slightly steeper learning curve.</li>
+      </ul>
+      <p>Most modern headless CMSes give you both.</p>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>A developer Slacks you: "Hey, the app currently shows 'Something went wrong' for about 47 different API failures. Compliance wants every error to specifically tell users what happened, what they can do, and whether to contact support. Can you write 47 error messages?"</p>
+        <p><strong>Old you:</strong> "Sure, send me the spec." Three weeks of writing.</p>
+        <p><strong>New you:</strong> "Let's look at the actual API responses. The 47 failures probably fall into 6 or 7 categories — network, invalid input, permission denied, server error, third-party service down, rate-limited. Let's model an error <em>pattern</em>: <code>{ type, title, body, recoveryAction }</code>, and a mapping from API error codes to patterns. We'll need eight strings instead of 47, every new error gets mapped to a pattern instead of freshly written, and compliance can audit one set of patterns instead of chasing 47 strings."</p>
+        <p>You just turned a copywriting task into a content engineering decision. That's the role.</p>` },
+
+      { type: "activity", id: "4.1", title: "Read a real API response", prompt: `<p>Open a terminal (Mac: Terminal app; Windows: PowerShell). Type this command exactly and press Enter:</p>
+        <pre><code>curl https://jsonplaceholder.typicode.com/posts/1</code></pre>
+        <p>You'll see a JSON response come back. That's a real HTTP API call. Now try:</p>
+        <pre><code>curl https://jsonplaceholder.typicode.com/users/1</code></pre>
+        <p>Look at the shape. Note the <code>address.geo.lat</code> — that's an object inside an object. Note that <code>id</code> is a number, not a string. This is the world that engineers live in. You now live in it too.</p>
+        <p>Paste what you see into the workspace below, and note what surprised you.</p>`,
+        placeholder: "API response I got:\n\n```json\n...\n```\n\nWhat I noticed / what surprised me:\n- " },
+
+      { type: "activity", id: "4.2", title: "Trace a piece of content end-to-end", prompt: `<p>Pick any text on your company's homepage. Open browser DevTools (right-click → Inspect → Network tab → refresh the page). Look for requests that return JSON. Find the one containing your text. You've just traced a piece of content from CMS → API → browser → screen.</p>
+        <p>If your company's site is fully static (no API at runtime), check the GitHub repo or content folder instead. The principle is the same: content lives somewhere structured, and a build step turns it into HTML.</p>`,
+        placeholder: "Text I picked: ...\nWhere I found it in the network tab: ...\nWhat the JSON looked like: ..." },
+
+      { type: "activity", id: "4.3", title: "Sketch the data shape for your content type", prompt: `<p>Take the content type you modeled in Module 3. Write what its API response would look like as JSON. Don't worry about syntax errors — focus on the shape:</p>
+        <pre><code>{
+  "id": "...",
+  "title": "...",
+  "author": { "id": "...", "name": "..." },
+  ...
+}</code></pre>
+        <p>This is now a contract you can hand to a developer.</p>`,
+        placeholder: "{\n  \"id\": \"\",\n  \"\": \"\",\n  \"\": {\n    \"\": \"\"\n  }\n}" },
+
+      { type: "apply", html: `<p>The next time a developer mentions "the API," don't nod and change the subject. Ask: "Can you show me the JSON?" Look at it together. It will not be scary.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What's the difference between a request and a response?",
+        "If a field is null in a JSON response, what does that mean for rendering?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m5",
+    section: "Module 5",
+    number: "05",
+    title: "Headless CMS in Practice",
+    intro: "A traditional CMS couples content to a website. A headless CMS stores content and hands it out via API, leaving 'what to do with it' to whatever consumes the API. This is the architecture nearly all modern content engineering work happens in.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>WordPress and classic Drupal are traditional CMSes. They couple content tightly to a website's templates. Headless CMSes (Sanity, Contentful, Storyblok, Strapi, Prismic, Payload, Hygraph) decouple them. Content lives in the CMS, and any front-end can consume it.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "Popular headless CMSes to recognize" },
+      { type: "prose", html: `<ul>
+        <li><strong>Sanity</strong> — schema-as-code, highly flexible, great developer experience, free tier generous.</li>
+        <li><strong>Contentful</strong> — enterprise standard, GUI model builder, robust ecosystem.</li>
+        <li><strong>Storyblok</strong> — visual editor, popular with marketing teams.</li>
+        <li><strong>Strapi</strong> — open source, self-hostable.</li>
+        <li><strong>Prismic</strong> — slice-based modeling, good for marketing sites.</li>
+        <li><strong>Payload</strong> — newer, open source, code-first, gaining momentum.</li>
+        <li><strong>Hygraph (formerly GraphCMS)</strong> — GraphQL-first.</li>
+      </ul>
+      <p>You don't need to know all of them. You need to know one deeply and be conversant about the rest.</p>` },
+
+      { type: "minor", text: "The general pattern across all of them" },
+      { type: "prose", html: `<ol>
+        <li>You define <strong>content models</strong> (schemas) — either through a GUI or as code.</li>
+        <li>Editors fill in content through an <strong>editing interface</strong>.</li>
+        <li>The CMS exposes a <strong>REST and/or GraphQL API</strong>.</li>
+        <li>Front-ends (web, mobile, etc.) <strong>fetch from the API</strong> and render.</li>
+        <li>Optional: <strong>webhooks</strong> trigger builds, notifications, or sync to other systems when content changes.</li>
+      </ol>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your healthtech company is launching patient education in the app — short tips that appear contextually ("you have an upcoming cardiology appointment" triggers a tip about what to bring; "new medication added" triggers a tip about interactions). Today, the content team writes these tips in Google Docs, designers paste them into Figma, developers hardcode them into the app.</p>
+        <p>Six months later, a tip about medication interactions has wrong information. No one knows where the source of truth is — the Google Doc was updated, the app wasn't. Patients saw the wrong info for three weeks. Compliance is furious.</p>
+        <p>The fix isn't writing better tips. It's: <code>EducationalTip</code> becomes a content type in a headless CMS. Fields: title, body, category, severity, <em>last reviewed by clinician</em> (with reference), <em>last reviewed at</em>, applicable regions, version. The app fetches from the CMS. Updates flow through to every surface at once. Audits become a query.</p>` },
+
+      { type: "activity", id: "5.1", title: "Build your first content model in a real CMS", prompt: `<p><strong>This is the most important activity in the course. Do not skip it.</strong></p>
+        <ol>
+          <li>Go to <a href="https://www.sanity.io" target="_blank">sanity.io</a> and sign up (free).</li>
+          <li>Create a new project. Choose the "Blog" starter or "Clean project" — either works.</li>
+          <li>Open the schema files in your code editor (or browse the schema in the dashboard). Look at how an Author or Post is defined.</li>
+          <li>Now add a new content type yourself: <strong>EducationalTip</strong> (a piece of in-product educational content shown contextually — works for healthtech, fintech, or any regulated product). It needs:
+            <ul>
+              <li><code>title</code> (string, required, max 80 chars)</li>
+              <li><code>body</code> (rich text / portable text)</li>
+              <li><code>category</code> (string, enum — define your own: e.g., "medication" / "appointment" / "billing" for healthtech; "fees" / "security" / "tax" for fintech)</li>
+              <li><code>severity</code> (string enum: "informational" / "important" / "critical")</li>
+              <li><code>trigger</code> (string — what in-product event surfaces this tip, e.g., "new-medication-added")</li>
+              <li><code>lastReviewedBy</code> (reference to Reviewer — a new type you'll create)</li>
+              <li><code>lastReviewedAt</code> (date)</li>
+              <li><code>applicableRegions</code> (array of strings — e.g., ["US-CA", "US-NY", "UK"])</li>
+              <li><code>relatedTips</code> (array of references to other EducationalTip)</li>
+              <li><code>published</code> (boolean, default false)</li>
+            </ul>
+          </li>
+          <li>Create the <code>Reviewer</code> type too: <code>name</code>, <code>credentials</code> (e.g., "MD, internal medicine" or "Compliance Officer, EU"), <code>team</code>, <code>photo</code>.</li>
+          <li>Add at least 2 sample tips through the editing interface.</li>
+          <li>Open the API playground (Sanity calls it "Vision"). Run a query to fetch all tips. Then run a query to fetch only "critical" tips that apply to "US-CA".</li>
+        </ol>
+        <p>If you can do this, you have done the work of an entry-level content engineer.</p>`,
+        placeholder: "My Sanity project URL: ...\n\nWhat tripped me up:\n- \n\nThe GROQ queries I wrote:\n```\n*[_type == 'educationalTip']\n```\n\nHow long this took me: ...\n\nReflections:\n- " },
+
+      { type: "activity", id: "5.2", title: "Compare authoring experience", prompt: `<p>Open the editing interface for one of your episodes. Ask yourself, from the perspective of a non-technical writer:</p>
+        <ul>
+          <li>Are the field labels clear? Or do they say <code>audioUrl</code> instead of "Audio file URL"?</li>
+          <li>Are there helper texts on confusing fields?</li>
+          <li>Is required vs optional obvious?</li>
+          <li>If a field needs a specific format, is there guidance?</li>
+        </ul>
+        <p>Now go fix three things to make the authoring experience better. This is <strong>AX work</strong> — a real and underrated part of the content engineer's job. Editors are users too.</p>`,
+        placeholder: "AX problems I spotted:\n1. \n2. \n3. \n\nWhat I changed:\n1. \n2. \n3. " },
+
+      { type: "apply", html: `<p>Find out which CMS your company uses. Ask a developer to walk you through the schema for one content type. Don't pretend to understand things you don't — just ask. You'll get a faster education in one 30-minute walkthrough than from any tutorial.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What's the difference between a headless CMS and a traditional CMS?",
+        "Why might you reference an Author rather than embed their name as a string?",
+        "What does AX mean and why do you care about it?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m6",
+    section: "Module 6",
+    number: "06",
+    title: "Markdown, MDX, and Component Content",
+    intro: "A surprising amount of modern content isn't in a CMS at all — it's in Markdown files in a Git repo. Documentation, technical blogs, developer marketing. As a content engineer, you need to be fluent here too.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>Headless CMSes are great for marketing teams and editorial workflows. Markdown in Git is great for technical docs and content that lives close to code. A modern content engineer works fluently across both.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "Markdown basics" },
+      { type: "prose", html: `<pre><code># Heading 1
+## Heading 2
+
+**bold** and *italic* and \`inline code\`
+
+- bullet
+- list
+
+[link text](https://example.com)</code></pre>
+        <p>You're literally reading rendered Markdown right now.</p>` },
+
+      { type: "minor", text: "Frontmatter — structured metadata in a Markdown file" },
+      { type: "prose", html: `<pre><code>---
+title: How to bake bread
+author: Mira Kapoor
+publishedAt: 2025-09-14
+tags: [bread, baking]
+---
+
+The body of the article starts here.</code></pre>
+        <p>That frontmatter block is essentially a content record. The body below is the unstructured part. Together: semi-structured content.</p>` },
+
+      { type: "minor", text: "MDX — Markdown plus components" },
+      { type: "prose", html: `<pre><code>---
+title: Pricing
+---
+
+# Our plans
+
+&lt;PricingTable tier="pro" /&gt;
+
+Everything below is back to normal Markdown.</code></pre>
+        <p>The <code>&lt;PricingTable&gt;</code> is a real React component that gets rendered in place. This is <strong>componentized content</strong> — and it's how docs sites like Stripe's, Linear's, and Vercel's are built.</p>` },
+
+      { type: "minor", text: "Static site generators" },
+      { type: "prose", html: `<ul>
+        <li><strong>Next.js</strong> (with <code>next-mdx-remote</code> or <code>contentlayer</code>) — most common professionally</li>
+        <li><strong>Astro</strong> — content-first, gaining ground fast</li>
+        <li><strong>Hugo, Jekyll, Eleventy</strong> — older but solid</li>
+        <li><strong>Docusaurus, Nextra, Mintlify</strong> — purpose-built for docs</li>
+      </ul>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your help center has 200 articles. Each one uses callouts inconsistently — some authors use markdown blockquotes for warnings, some use bold paragraphs labeled "WARNING:", some use raw HTML <code>&lt;div class="alert"&gt;</code>. In a fintech context, this isn't just messy — a legal audit finds three articles where required risk disclosures aren't visually distinct enough to be defensible. Legal asks you to "make all disclosures consistent."</p>
+        <p>You propose: articles become MDX. A <code>&lt;Callout type="warning"&gt;</code> component is built once. A <code>&lt;RegulatoryDisclosure jurisdiction="US" type="risk-disclosure"&gt;...&lt;/RegulatoryDisclosure&gt;</code> component renders disclosures with mandated styling, Schema.org markup, and a "last approved by legal" timestamp. A CI check fails if an article uses the raw text "Disclosure:" without the component.</p>
+        <p>Writers write Markdown. Engineers build components. Legal updates the component once and every disclosure in the codebase updates. This is content engineering at the file-system level.</p>` },
+
+      { type: "activity", id: "6.1", title: "Write a piece of structured Markdown", prompt: `<p>Open any text editor. Create a file called <code>help-article-001.md</code>. Write a help article with compliance-aware frontmatter:</p>
+        <pre><code>---
+title: "Setting up two-factor authentication"
+slug: "set-up-2fa"
+category: "account-security"
+lastReviewedBy: priya-natarajan
+lastReviewedAt: 2025-11-04
+applicableRegions:
+  - US
+  - UK
+  - EU
+productAreas:
+  - retail-banking
+  - business-banking
+complianceCategory: "kyc-aml"
+status: published
+relatedArticles:
+  - recover-account
+  - update-phone-number
+---
+
+# Setting up two-factor authentication
+
+Two-factor authentication adds...
+
+## Choose your method
+
+You can use...
+
+## Troubleshooting
+
+If you don't receive your code...</code></pre>
+        <p>Notice: the frontmatter is <em>the exact same shape</em> as the CMS content model would be. That's because they're the same content — just stored differently. A content engineer can move content between these formats fluently. In a regulated product, fields like <code>lastReviewedBy</code> and <code>complianceCategory</code> aren't nice-to-haves — they're how an auditor checks your work.</p>`,
+        placeholder: "Paste your markdown here, or note what you made and where it lives..." },
+
+      { type: "activity", id: "6.2", title: "Build a tiny docs site with Astro (optional but recommended)", prompt: `<p>If you're feeling brave:</p>
+        <ol>
+          <li>Install Node.js if you don't have it.</li>
+          <li>In a terminal: <code>npm create astro@latest</code> — choose the "Docs" or "Blog" template.</li>
+          <li>Add three Markdown files in the content folder.</li>
+          <li>Run <code>npm run dev</code> and open the local URL.</li>
+        </ol>
+        <p>You now have a working static content site running on your machine. You can stop here, or you can spend an evening playing with the templates and seeing how content becomes pages. Either way, you've crossed a threshold.</p>`,
+        placeholder: "What worked, what broke, what surprised me:\n- \n- \n- " },
+
+      { type: "apply", html: `<p>If your company has internal docs in Confluence or Notion, ask: would these be better as Markdown in a repo? You don't have to migrate anything — just have the conversation. It will surface a lot about how your org thinks about content infrastructure.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What's the difference between Markdown and MDX?",
+        "Why is frontmatter a form of structured content?",
+        "When would you choose a headless CMS over Markdown files, and vice versa?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m7",
+    section: "Module 7",
+    number: "07",
+    title: "Schemas, Metadata, and Taxonomies",
+    intro: "Every CMS, every Markdown file, every API response is governed by a schema. The taxonomy you wrap around content is what makes it findable, filterable, and meaningful at scale.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>Schemas are contracts. Taxonomies are how content gets organized and discovered. A content engineer owns both — and pushes back when either is weakly designed.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "Schema — three overlapping meanings" },
+      { type: "prose", html: `<ul>
+        <li>A <strong>CMS content model schema</strong> (the fields you defined for Episode in Module 5).</li>
+        <li>A <strong>JSON Schema</strong> — a portable, language-agnostic way to describe the shape of a JSON object.</li>
+        <li><strong>Schema.org</strong> — a shared vocabulary for describing things on the web (Person, Article, Recipe, Product, Event). When you mark up a page with Schema.org, Google and other engines understand it better.</li>
+      </ul>` },
+
+      { type: "minor", text: "Metadata and taxonomy" },
+      { type: "prose", html: `<p><strong>Metadata</strong> is data <em>about</em> content — not the content itself. Title, author, published date, locale, status, tags. The frontmatter from Module 6 was metadata.</p>
+        <p><strong>Taxonomy</strong> is the organized system of categories, tags, and relationships you use to classify content. Two main shapes:</p>
+        <ul>
+          <li><strong>Controlled vocabulary</strong> — a fixed, curated list of allowed values. ("Difficulty" can only be beginner / intermediate / advanced.) Better for filters, navigation, analytics.</li>
+          <li><strong>Folksonomy</strong> — free-form tags writers can invent. Better for emergent topics, worse for analytics because of inconsistency ("Customer Story" vs "customer-stories" vs "case study").</li>
+        </ul>
+        <p>A good content engineer often pushes hard toward controlled vocabularies for anything that drives UI or analytics, while allowing free tags for editorial flexibility.</p>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your help center's categories are a mess. "Account", "Accounts", "My Account", and "Account Management" are all separate tags. There are 60 tags total, used inconsistently. In your regulated industry, this isn't just an analytics problem — your compliance team needs to find every article tagged "kyc" or "aml" for an annual audit, and they currently can't, because the tags drift.</p>
+        <p>You audit. You propose: a controlled <em>customer-facing</em> taxonomy of ~15 categories (clear, jargon-light: "Logging in", "Sending money", "Account security"), plus a separate ~12-item <em>internal compliance taxonomy</em> (KYC, AML, GDPR, PSD2, etc.) that's invisible to customers but lets internal teams query the corpus. You define every tag with a "use this when..." rule. Both fields become enum dropdowns in the CMS, not free text.</p>
+        <p>Six months later, the next audit takes a day instead of a fortnight. You did taxonomy engineering in a regulated context.</p>` },
+
+      { type: "activity", id: "7.1", title: "Audit your real taxonomy", prompt: `<p>Find your company's blog, help center, or content hub. List every tag or category currently in use. Then:</p>
+        <ol>
+          <li>Group near-duplicates (capitalization variants, synonyms).</li>
+          <li>Identify orphan tags (used on 1–2 items only).</li>
+          <li>Spot missing categories (clusters of content with no shared tag).</li>
+          <li>Propose a cleaned-up taxonomy: target ≤15 top-level categories, with optional secondary tags.</li>
+        </ol>
+        <p>Write up: which tags merge into which, which get deleted, which get added. This is a real deliverable you could pitch to your manager.</p>`,
+        placeholder: "Source I audited:\n\nDuplicates / variants found:\n- AI / ai / Artificial Intelligence -> merge to: ...\n\nOrphan tags:\n- ...\n\nProposed canonical taxonomy:\n1. ...\n2. ...\n\nMigration plan:\n- ..." },
+
+      { type: "activity", id: "7.2", title: "Mark up a help article with Schema.org", prompt: `<p>Pick any help article on your company's support site. View its HTML source (right-click → View Page Source). Search for "schema.org" — does it appear? If yes, look at what's there. If no, write the markup it <em>should</em> have. For a help article, you usually want <code>Article</code> plus, if the article has Q&amp;A sections, <code>FAQPage</code>.</p>
+        <p>Use <a href="https://schema.org/Article" target="_blank">schema.org/Article</a> and <a href="https://schema.org/FAQPage" target="_blank">schema.org/FAQPage</a> as references. At minimum:</p>
+        <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to set up two-factor authentication",
+  "author": {
+    "@type": "Organization",
+    "name": "Your Company Support"
+  },
+  "datePublished": "2025-09-14",
+  "dateModified": "2025-11-04",
+  "image": "https://example.com/2fa-screenshot.png"
+}
+&lt;/script&gt;</code></pre>
+        <p>For a regulated product, semantic markup matters more than it does for a blog. It's how Google's "helpful content" surfaces find your canonical instructions instead of a third-party guide with outdated information. It's also how AI assistants citing your product correctly attribute and date their answers.</p>`,
+        placeholder: "Help article I audited:\nSchema markup currently present (Y/N): \nWhat I'd add or fix:\n\n{\n  \"@context\": \"https://schema.org\",\n  ...\n}" },
+
+      { type: "apply", html: `<p>In your next content review, look at the tags being applied. Ask: "Are these from a defined list, or did the writer make them up? Who decides what tags exist?" Often the answer is: nobody decides, and that's the problem.</p>` },
+
+      { type: "selfcheck", questions: [
+        "Difference between metadata and content?",
+        "When is a controlled vocabulary better than open tagging?",
+        "Why might Schema.org markup affect how an LLM cites your content?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m8",
+    section: "Module 8",
+    number: "08",
+    title: "Content for AI and LLMs",
+    intro: "LLMs are now a major consumer of content. Your product's help center isn't just read by humans — it's chunked, embedded, and fed into chatbots, AI search, and AI summarizers. Content well-engineered for AI is content well-engineered for everything.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>This is the fastest-moving area of the field, and it's where your content design instincts (clarity, audience, structure) translate most directly into engineering value. Lean in.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "Retrieval-Augmented Generation (RAG) in plain English" },
+      { type: "prose", html: `<p>RAG is the dominant pattern for AI assistants that use your content. Roughly:</p>
+        <ol>
+          <li>Your content is split into <strong>chunks</strong> (paragraphs, sections).</li>
+          <li>Each chunk is converted into an <strong>embedding</strong> — a numeric fingerprint of its meaning.</li>
+          <li>When a user asks a question, the question becomes an embedding too.</li>
+          <li>The system retrieves the chunks whose embeddings are most similar.</li>
+          <li>Those chunks are stuffed into an LLM's context with the question. The LLM answers using them.</li>
+        </ol>` },
+
+      { type: "minor", text: "What this means for content" },
+      { type: "prose", html: `<ul>
+        <li><strong>Chunks should stand alone.</strong> If a paragraph relies on context from three sections above, RAG will retrieve it and the LLM will be confused. Write so that each meaningful section makes sense on its own.</li>
+        <li><strong>Headings are anchors.</strong> Good H2/H3 structure helps chunking algorithms split content at meaningful boundaries.</li>
+        <li><strong>Define jargon explicitly.</strong> A glossary section, or inline definitions, gives the model what it needs.</li>
+        <li><strong>Avoid hidden meaning.</strong> "Click the button" is bad — <em>which</em> button? Spell it out: "Click the <strong>Save</strong> button in the top right."</li>
+        <li><strong>Don't bury the lede.</strong> State the answer in the first sentence. RAG retrieval favors chunks that look like answers.</li>
+        <li><strong>Mark up structure semantically.</strong> Schema.org, ARIA labels, sensible HTML — all of it helps AI systems understand role and relationship.</li>
+      </ul>` },
+
+      { type: "minor", text: "llms.txt" },
+      { type: "prose", html: `<p><code>llms.txt</code> is an emerging proposal: a file at the root of a site that gives LLMs a curated map of your important content. Whether or not it becomes a standard, the principle — <em>be intentional about what AI sees</em> — is real and worth adopting.</p>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your fintech's AI assistant is telling customers wrong information about overdraft fees. You investigate.</p>
+        <p>The overdraft policy article has a paragraph that says "the standard fee applies" — the actual fee amount was in the paragraph above, which the chunker split off. Two other articles state the fee as "$35" in one place and "$34 (subject to change)" in another. There's no canonical source.</p>
+        <p>In a regulated industry, this isn't a UX bug — it's a compliance incident. An AI assistant giving wrong fee information could trigger CFPB scrutiny, customer complaints, and required restitution.</p>
+        <p>Fix: rewrite the overdraft article so each section is standalone — every paragraph that mentions the fee includes the number, not "the fee." Consolidate the conflicting articles into one source of truth. Tag the canonical one with <code>isCanonical: true</code>. Update chunking to respect section boundaries. The AI improves overnight; compliance is satisfied. <strong>You just did content engineering for AI in a regulated context.</strong></p>` },
+
+      { type: "activity", id: "8.1", title: "Make a piece of content RAG-ready", prompt: `<p>Take one help article from your product — ideally one that touches a regulated topic (fees, security, eligibility, data handling, account closure, identity verification). Read it as if you only had access to one paragraph at a time, in random order. For each paragraph:</p>
+        <ul>
+          <li>Does it stand alone? Or does it depend on context above?</li>
+          <li>Does it use undefined pronouns ("this," "that," "it") whose referent is in another paragraph?</li>
+          <li>Does it define its terms? Does it state the specific number, date, or condition — or does it say "the applicable fee" / "the standard timeframe" / "in certain cases"?</li>
+          <li>If a fact is regulated (a fee, a deadline, a disclosure), is it stated explicitly in <em>every</em> paragraph that references it, not just at the top?</li>
+        </ul>
+        <p>Rewrite the article so every paragraph passes the standalone test. Don't make it robotic — just self-contained. In a regulated product, this is how you protect against an AI assistant quoting the wrong half of your own article.</p>`,
+        placeholder: "Original article URL / title:\n\nProblems I found:\n- [paragraph X] uses 'the applicable fee' without naming the amount\n- ...\n\nRewritten version:\n\n..." },
+
+      { type: "activity", id: "8.2", title: "Write an llms.txt", prompt: `<p>Pick any product or service (yours, ideally). Draft a <code>/llms.txt</code> file. The proposed format is Markdown:</p>
+        <pre><code># Your Company Name
+
+&gt; One-paragraph description of what you do.
+
+## Docs
+
+- [Getting started](https://example.com/docs/getting-started): how new users set up
+- [API reference](https://example.com/docs/api): full REST API docs
+
+## Policies
+
+- [Refund policy](https://example.com/refunds): the canonical refund rules
+- [Privacy](https://example.com/privacy)
+
+## Optional
+
+- [Blog](https://example.com/blog)</code></pre>
+        <p>You've now thought about your content from an LLM's perspective. Few content people have.</p>`,
+        placeholder: "# Company Name\n\n> Description...\n\n## Docs\n\n- [Title](url): description\n\n## Policies\n\n- ..." },
+
+      { type: "apply", html: `<p>If your company has any AI feature (chatbot, smart search, AI-generated summaries), find the content it draws from. Read three pieces of that content with the "standalone chunk" lens. Propose one rewrite. This is your portfolio in the making.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What is RAG?",
+        "Why are headings important for AI consumption?",
+        "Name two ways to make a paragraph easier for an LLM to retrieve usefully."
+      ]}
+    ]
+  },
+
+  {
+    id: "m9",
+    section: "Module 9",
+    number: "09",
+    title: "Localization and Multi-Channel Delivery",
+    intro: "Content engineering really earns its name the moment content needs to exist in multiple languages, regions, and channels. Early architecture decides whether localization is painful or routine.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>When content lives in one structured place and is rendered by templates, multiplying it across languages and channels becomes a configuration problem rather than a writing problem.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "i18n vs l10n" },
+      { type: "prose", html: `<p><strong>Localization (l10n)</strong> is adapting content for a specific locale: translating, but also changing currency, date formats, addresses, units, idioms, cultural references, and sometimes whole sections.</p>
+        <p><strong>Internationalization (i18n)</strong> is designing your content system so localization is <em>possible</em> — separating translatable strings from code, allowing locale-specific overrides, handling right-to-left languages, etc.</p>
+        <p><strong>Locale</strong> is more specific than "language." <code>en-US</code> (English, United States) and <code>en-GB</code> (English, United Kingdom) are different locales. Pricing differs, spelling differs, examples differ.</p>` },
+
+      { type: "minor", text: "Two main localization models in CMSes" },
+      { type: "prose", html: `<ul>
+        <li><strong>Field-level localization:</strong> every translatable field has a value per locale. The same record holds English, French, German values for its <code>title</code> field.</li>
+        <li><strong>Entry-level localization:</strong> there's one record per locale, linked via a shared <code>id</code> or <code>key</code>. The French record is a separate entry from the English one.</li>
+      </ul>
+      <p>Both have tradeoffs. Field-level is cleaner for parallel translation. Entry-level is cleaner when locales need to diverge significantly (different images, different content order, different sections entirely).</p>` },
+
+      { type: "minor", text: "Channels — the broader problem" },
+      { type: "prose", html: `<p>The same content rendered to web, iOS, Android, email, voice, smartwatch, print. Each channel has different constraints (character limits, no images, no rich text, voice-friendly phrasing).</p>
+        <p><strong>Channel-aware content</strong> sometimes means modeling multiple variants of a field: <code>headline</code>, <code>headline_short</code> (for cards), <code>headline_voice</code> (for Alexa). Sometimes it means a single canonical version that channels truncate or transform.</p>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>Your US fintech is expanding into the EU. Marketing assumes "we'll translate the product and website." Six months in, the project is in trouble.</p>
+        <p>What no one modeled in advance:</p>
+        <ul>
+          <li>Required GDPR disclosures don't exist in the US content at all.</li>
+          <li>PSD2 strong-customer-authentication language is mandatory in the EU but reads strangely (and creates US legal risk) if shown to US users.</li>
+          <li>"Bank account" translates fine, but the <em>concept</em> differs — IBAN vs ACH routing, different account types, different fee structures.</li>
+          <li>Customer testimonials are all from US small businesses; irrelevant for German enterprise users.</li>
+          <li>The "Pricing" page references USD only, with hardcoded "$" symbols inside content strings.</li>
+          <li>Date format is hardcoded <code>MM/DD/YYYY</code> inside several content fields.</li>
+          <li>Risk disclosures need different wording (and sometimes different languages) per jurisdiction — there's no field to hold them.</li>
+        </ul>
+        <p>A content engineer, six months earlier, would have modeled this: jurisdictionally-required disclosures as their own content type, regional currency/date rendered locale-aware (never inside content strings), testimonials tagged by region and industry, regulatory text referenced from a per-jurisdiction Disclosure type. Not exotic. Just planned at the modeling stage, not bolted on at the translation stage.</p>` },
+
+      { type: "activity", id: "9.1", title: "Localization-readiness audit", prompt: `<p>Take one page on your product. Imagine it has to launch in Japanese tomorrow. Make a list of everything on that page that would break, mistranslate, or be culturally wrong if you literally translated word-for-word.</p>
+        <p>You'll find:</p>
+        <ul>
+          <li>Idioms that don't carry over</li>
+          <li>Currency</li>
+          <li>Date formats</li>
+          <li>Names</li>
+          <li>Examples that don't resonate</li>
+          <li>Imagery</li>
+          <li>Length: German is often 30% longer than English, Japanese can be much shorter — does your design accommodate it?</li>
+        </ul>
+        <p>Group the findings into:</p>
+        <ol>
+          <li><strong>Content model changes needed</strong> (e.g., currency must be a structured field, not part of a string)</li>
+          <li><strong>Translation guidance needed</strong> (e.g., a glossary of brand terms not to translate)</li>
+          <li><strong>Per-locale overrides needed</strong> (e.g., this whole testimonial section needs different content)</li>
+        </ol>`,
+        placeholder: "Page audited: \n\nProblems found:\n- \n\nContent model changes needed:\n- \n\nTranslation guidance needed:\n- \n\nPer-locale overrides needed:\n- " },
+
+      { type: "activity", id: "9.2", title: "Multi-channel modeling", prompt: `<p>Take any single content type from your earlier work. Now imagine it needs to render on: web, push notification, email subject line, voice assistant.</p>
+        <p>For each channel, ask: what's the maximum length, what fields do I need, what fields don't I need, what would I rephrase?</p>
+        <p>Then update your content model. You might add <code>pushTitle</code> (max 50 chars), <code>emailSubject</code> (max 80 chars), <code>voiceSummary</code> (one sentence, no abbreviations).</p>`,
+        placeholder: "Content type:\n\nChannel: web — fields needed: ..., length: ...\nChannel: push — fields needed: ..., length: ...\nChannel: email subject — fields needed: ..., length: ...\nChannel: voice — fields needed: ..., length: ...\n\nNew/modified fields in my model:\n- " },
+
+      { type: "apply", html: `<p>Even if your company is single-language, ask: "Are we modeling content in a way that would let us localize next year without a rewrite?" The answer is almost always "no, but we should." That's a useful conversation to start.</p>` },
+
+      { type: "selfcheck", questions: [
+        "Difference between i18n and l10n?",
+        "Field-level vs entry-level localization — when does each make sense?",
+        "Why does multi-channel delivery push you toward more granular content models?"
+      ]}
+    ]
+  },
+
+  {
+    id: "m10",
+    section: "Module 10",
+    number: "10",
+    title: "Workflow, Git, and Working with Engineers",
+    intro: "Content engineering happens inside engineering workflows. You'll be in pull requests, ticket trackers, code reviews, and standups. The mechanics aren't optional — they're how your work gets shipped.",
+    sections: [
+      { type: "head", text: "The shift", num: "I" },
+      { type: "prose", html: `<p>You don't need to be a developer. You need to be conversant in the tools developers use, so your work plugs into their workflow rather than sitting beside it.</p>` },
+
+      { type: "head", text: "Concepts", num: "II" },
+      { type: "minor", text: "Git — the mental model" },
+      { type: "prose", html: `<ul>
+        <li>A <strong>repo</strong> is a project's folder, tracked over time.</li>
+        <li>A <strong>commit</strong> is a saved snapshot with a message.</li>
+        <li>A <strong>branch</strong> is a parallel timeline for working on something.</li>
+        <li>A <strong>pull request (PR) / merge request (MR)</strong> is a proposal to merge one branch into another. People review it and discuss.</li>
+      </ul>
+      <p>You don't need to be a Git wizard. You need to be able to: clone a repo, make a branch, edit files, commit and push, open a PR, respond to review comments. That's it. GitHub Desktop or the VS Code Git panel make this almost click-driven.</p>` },
+
+      { type: "minor", text: "CI/CD for content" },
+      { type: "prose", html: `<ul>
+        <li><strong>Continuous Integration (CI):</strong> when content changes, automated checks run (link checks, schema validation, spell check, accessibility checks).</li>
+        <li><strong>Continuous Deployment (CD):</strong> when content merges, the site rebuilds and deploys automatically.</li>
+      </ul>
+      <p><strong>Webhooks:</strong> when content changes in a CMS, the CMS sends an HTTP request to a URL you specify. Common uses: trigger a site rebuild, notify Slack, update a cache, push to a translation vendor.</p>` },
+
+      { type: "minor", text: "Working with engineers — the patterns" },
+      { type: "prose", html: `<ul>
+        <li><strong>Brief the model, not the page.</strong> When you spec work, hand the engineer a content model and example records, not a Figma file with copy in it.</li>
+        <li><strong>Own the schema.</strong> The content engineer is usually the keeper of the schema. Changes go through you.</li>
+        <li><strong>Speak in fields.</strong> "We need a field for X" is a far better starting point than "we need a section that has X."</li>
+        <li><strong>Don't ship copy in code.</strong> Pushing for a "no hardcoded strings" rule is one of the most valuable changes you can advocate for. Every user-facing string should come from content.</li>
+      </ul>` },
+
+      { type: "head", text: "Real-world scenario", num: "III" },
+      { type: "scenario", html: `<p>A developer is implementing a new identity verification (KYC) flow. They Slack you the wireframe: "Need copy for these 15 steps." You drop the strings into the Slack thread. They paste them into the code.</p>
+        <p>Two weeks later, legal asks to change <em>one</em> specific risk disclosure — the one that appears in 4 of the 15 steps (with slight wording variations because of how it got copy-pasted). Engineers have to do a code release. Three of the four copies get updated; one is missed. A customer screenshot of the un-updated screen ends up in a compliance complaint.</p>
+        <p>Better version: you ask up front, "where will these strings live so legal can change a disclosure without a code deploy?" The answer: a <code>KycFlowStep</code> content type in the CMS, with a reference to a <code>Disclosure</code> content type. Disclosures live in one place. When legal updates a disclosure, every step that references it updates everywhere it appears, instantly. No code deploy. No missed copy. You've engineered the workflow, not just the words.</p>` },
+
+      { type: "activity", id: "10.1", title: "Make your first PR", prompt: `<p>Find any open-source project's docs or content repo. Some friendly options:</p>
+        <ul>
+          <li><a href="https://github.com/mdn/content" target="_blank">MDN Web Docs</a> — accepts typo fixes and improvements</li>
+          <li>Any small docs site on GitHub</li>
+          <li>Your own forked copy of a tutorial repo</li>
+        </ul>
+        <p>Fix a typo. Open a pull request. Have a stranger on the internet review your contribution. You will have done something many designers never do, and it will demystify the entire process.</p>
+        <p>If you can't find one to contribute to, do this instead:</p>
+        <ol>
+          <li>Create a free GitHub account.</li>
+          <li>Make a new repo called <code>my-content-portfolio</code>.</li>
+          <li>Add a Markdown file with your case studies from this course.</li>
+          <li>Make at least 3 commits with meaningful messages.</li>
+        </ol>
+        <p>You now have a working knowledge of Git.</p>`,
+        placeholder: "PR I opened (URL): ...\n\nWhat I learned in the process:\n- " },
+
+      { type: "activity", id: "10.2", title: "Spec a content change like an engineer", prompt: `<p>Take any content change request from your work. Instead of writing it as "change this string to X," write it as a ticket:</p>
+        <pre><code>TITLE: Add 'jurisdiction' field to RegulatoryDisclosure content type
+
+CONTEXT: Legal needs to vary disclosure wording per jurisdiction.
+Currently one disclosure is shown to all users regardless of region;
+this fails our EU launch readiness review.
+
+CONTENT MODEL CHANGE:
+- RegulatoryDisclosure: add field 'jurisdiction' (string enum:
+  "US", "UK", "EU", "global")
+- Validation: required; default to "global" for existing records
+- New: allow multiple Disclosures with same 'type' field as long as
+  jurisdictions differ
+- Reviewer: add a 'jurisdictionsCovered' field so the CMS can warn
+  if a reviewer isn't qualified for the jurisdiction being approved
+
+API IMPACT:
+- GET /disclosures?type=risk-disclosure now returns array, not single
+- Front-end must filter by user's locale to pick the right one
+- Each disclosure object: { id, type, jurisdiction, body, approvedBy,
+  approvedAt }
+
+UI IMPACT (out of scope, separate ticket):
+- Author UI: jurisdiction dropdown
+- Reader UI: no change (front-end picks based on user locale)
+
+MIGRATION:
+- Existing disclosures get jurisdiction="global"
+- Legal review meeting scheduled to author EU-specific variants
+  before EU launch</code></pre>
+        <p>This is what handing work to an engineer looks like when you're a content engineer. Notice it reads like an engineering ticket, not a copy spec.</p>`,
+        placeholder: "TITLE: \n\nCONTEXT: \n\nCONTENT MODEL CHANGE:\n- \n\nAPI IMPACT:\n- \n\nUI IMPACT:\n- \n\nMIGRATION:\n- " },
+
+      { type: "apply", html: `<p>Volunteer to attend an engineering standup or sprint planning. Don't talk much. Just listen. Notice how they break work down, how they spec tickets, how they talk about the codebase. This is the language you're learning.</p>` },
+
+      { type: "selfcheck", questions: [
+        "What's a pull request?",
+        "Why is 'no hardcoded strings' a content engineering principle?",
+        "How would you spec a content change to an engineer in a way that minimizes back-and-forth?"
+      ]}
+    ]
+  },
+
+  {
+    id: "capstone",
+    section: "Module 11",
+    number: "11",
+    title: "Capstone Project",
+    intro: "You've built models, queries, and rewrites in isolation. Now combine them. This is the portfolio piece you'll show in interviews.",
+    sections: [
+      { type: "head", text: "The brief", num: "I" },
+      { type: "prose", html: `<p>Pick one of these scenarios — all three are deliberately scoped for an enterprise/regulated content designer's portfolio. You can also invent your own at similar scope.</p>
+        <ul>
+          <li><strong>A fintech in-product help system.</strong> Help articles, glossary terms (financial concepts: APR, overdraft, ACH, IBAN), <em>regulatory disclosures</em>, FAQs. Different audiences (retail vs business banking). Multi-jurisdiction (US, EU, UK). Disclosures are their own content type, referenced from help articles. Articles have a <code>lastReviewedBy</code> referencing a compliance officer.</li>
+          <li><strong>A healthtech patient communication library.</strong> Educational tips, appointment reminders, medication alerts, post-visit summaries. Multi-channel (in-app, email, SMS, print). HIPAA-aware fields (some channels can show PHI, others can't). Clinical review workflow (every tip referenced to a clinician reviewer). Localized for at least one non-English market.</li>
+          <li><strong>An enterprise design-system content library.</strong> Error messages, empty states, onboarding tooltips, notification templates, transactional emails. Patterns with variables (<code>{userName}</code>, <code>{amount}</code>). Versioned. Approval workflows for legally-sensitive variants (anything mentioning fees, security, data handling). Used across product, with a "where this is used" reverse-lookup.</li>
+        </ul>` },
+
+      { type: "head", text: "The deliverables", num: "II" },
+      { type: "prose", html: `<ol>
+        <li><strong>A content model document.</strong> All types, all fields, all references, all validation. Diagram included.</li>
+        <li><strong>A working CMS instance</strong> (Sanity free tier is ideal) with the schemas built and at least 5 entries per type.</li>
+        <li><strong>A taxonomy spec.</strong> Categories, tags, definitions.</li>
+        <li><strong>A localization plan.</strong> Even if you only build one locale, document how a second locale would fit.</li>
+        <li><strong>An AI-readiness statement.</strong> Three things about your content model that make it work well for RAG.</li>
+        <li><strong>A short README.</strong> Treat it as if you were handing the system to a new content engineer. Explain the model, the rationale, and the tradeoffs you considered.</li>
+        <li><strong>A live or screenshotted authoring experience.</strong> Show the CMS editing interface for one content type, with the AX improvements you'd make.</li>
+      </ol>` },
+
+      { type: "head", text: "How to talk about it in interviews", num: "III" },
+      { type: "prose", html: `<p>Frame it as a system, not a portfolio piece:</p>
+        <blockquote>I designed a content model for a [domain]. I treated [X] as a referenced atom because it appears across [N] surfaces. I chose field-level localization because [reason]. I made tradeoff [Y] knowing it would cost [Z] but gain [W].</blockquote>
+        <p>That sentence — <em>tradeoffs</em> — is what content engineers say and content designers usually don't. It will get you hired.</p>` },
+
+      { type: "activity", id: "11.1", title: "Capstone planning workspace", prompt: `<p>Use this space to plan your capstone. The actual artifacts will live in Sanity, a GitHub repo, and a portfolio site — but you can outline them here first.</p>`,
+        placeholder: "Scenario I'm choosing: \n\nContent types:\n1. \n2. \n\nKey references / relationships:\n- \n\nTaxonomy plan:\n- \n\nLocalization approach:\n- \n\nRAG-readiness notes:\n- \n\nWhat I'll show in interviews:\n- \n\nWhere it lives:\n- Sanity project: \n- GitHub repo: \n- Portfolio writeup: " },
+
+      { type: "apply", html: `<p>Set a deadline. Two weeks from today, your capstone exists in some form, even if rough. Share a link in your next 1:1 with your manager. Half of getting hired as a content engineer is being the person who said "I made this thing and here it is."</p>` },
+
+      { type: "selfcheck", questions: [
+        "Can I articulate the three biggest tradeoffs in my content model?",
+        "Could a new content engineer read my README and understand the system?",
+        "Is there a public link I could share in an interview?"
+      ]}
+    ]
+  },
+
+  {
+    id: "appA",
+    section: "Appendix A",
+    number: "A",
+    title: "A working content engineer's bookshelf",
+    intro: "Read in roughly this order. None of these is required — but together they triangulate the role.",
+    sections: [
+      { type: "prose", html: `<ul>
+        <li><strong>Practical Content Strategy & Marketing</strong>, Julia McCoy — easy on-ramp</li>
+        <li><strong>The Content Strategy Toolkit</strong>, Meghan Casey — strategy frame</li>
+        <li><strong>Designing Connected Content</strong>, Carrie Hane & Mike Atherton — the core text on structured content</li>
+        <li><strong>Content Everywhere</strong>, Sara Wachter-Boettcher — the seminal accessible argument for structured content</li>
+        <li><strong>Practical Content Engineering</strong>, Sergey Belov — implementation side</li>
+        <li>The <strong>Sanity</strong> and <strong>Contentful</strong> docs — read them like a textbook, not a reference</li>
+      </ul>` }
+    ]
+  },
+
+  {
+    id: "appB",
+    section: "Appendix B",
+    number: "B",
+    title: "The vocabulary cheat sheet",
+    intro: "Bookmark this page. You'll come back to it whenever a meeting goes sideways with jargon.",
+    sections: [
+      { type: "prose", html: `<table>
+        <thead><tr><th>Term</th><th>Plain English</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Schema</strong></td><td>The shape of your content — what fields exist, what types they are</td></tr>
+          <tr><td><strong>Content type / model</strong></td><td>A category of content (Article, Author, Product)</td></tr>
+          <tr><td><strong>Field</strong></td><td>A property of a content type</td></tr>
+          <tr><td><strong>Reference</strong></td><td>A pointer from one record to another</td></tr>
+          <tr><td><strong>Entry / record / item</strong></td><td>One instance of a content type</td></tr>
+          <tr><td><strong>API</strong></td><td>The way one program asks another for content</td></tr>
+          <tr><td><strong>REST / GraphQL</strong></td><td>Two styles of API</td></tr>
+          <tr><td><strong>Endpoint</strong></td><td>A specific URL on a REST API</td></tr>
+          <tr><td><strong>Payload</strong></td><td>The body of a request or response</td></tr>
+          <tr><td><strong>JSON</strong></td><td>The text format most APIs use to send structured data</td></tr>
+          <tr><td><strong>Webhook</strong></td><td>An automated notification one system sends to another when something changes</td></tr>
+          <tr><td><strong>Headless CMS</strong></td><td>A CMS that exposes content via API and has no built-in front-end</td></tr>
+          <tr><td><strong>Static site generator</strong></td><td>A tool that turns Markdown/MDX + templates into a static website</td></tr>
+          <tr><td><strong>Markdown / MDX</strong></td><td>Plain-text formats for writing content; MDX adds components</td></tr>
+          <tr><td><strong>Frontmatter</strong></td><td>Structured metadata at the top of a Markdown file</td></tr>
+          <tr><td><strong>Schema.org</strong></td><td>A shared web vocabulary for marking up content semantically</td></tr>
+          <tr><td><strong>Taxonomy</strong></td><td>The organized system of categories, tags, and relationships</td></tr>
+          <tr><td><strong>Controlled vocabulary</strong></td><td>A curated list of allowed tag values</td></tr>
+          <tr><td><strong>RAG</strong></td><td>Retrieval-augmented generation — the dominant pattern for AI assistants using your content</td></tr>
+          <tr><td><strong>Embedding</strong></td><td>A numeric fingerprint of a piece of text's meaning</td></tr>
+          <tr><td><strong>Chunk</strong></td><td>A small piece of content used in RAG</td></tr>
+          <tr><td><strong>i18n / l10n</strong></td><td>Internationalization / localization</td></tr>
+          <tr><td><strong>Locale</strong></td><td>A specific language-and-region combination</td></tr>
+          <tr><td><strong>AX</strong></td><td>Authoring experience — the UX of the people creating content</td></tr>
+          <tr><td><strong>Git</strong></td><td>The version control system used industry-wide</td></tr>
+          <tr><td><strong>PR / MR</strong></td><td>Pull / merge request — proposal to merge code or content changes</td></tr>
+          <tr><td><strong>CI/CD</strong></td><td>Automated testing and deployment</td></tr>
+        </tbody>
+      </table>` }
+    ]
+  },
+
+  {
+    id: "appC",
+    section: "Appendix C",
+    number: "C",
+    title: "How to position yourself for the role",
+    intro: "Patterns that work for content designers transitioning into content engineering.",
+    sections: [
+      { type: "prose", html: `<ul>
+        <li><strong>Lead with the systems thinking.</strong> Anyone can claim to write good copy. Few content people can talk about content models, references, and tradeoffs. Lean into the rare skill.</li>
+        <li><strong>Build a portfolio of artifacts, not screenshots.</strong> A content model diagram, a Sanity studio link, a refactored taxonomy, a PR you opened — these are unusual and credible.</li>
+        <li><strong>Volunteer for the boring stuff.</strong> Migrations, schema cleanups, tag audits. They're undervalued and they're the work. Take them. They become your case studies.</li>
+        <li><strong>Find a half-step role first.</strong> Titles to look for: "Content Operations," "Content Strategist (technical)," "Content Systems Designer," "DocOps," "Documentation Engineer." Then move into "Content Engineer."</li>
+        <li><strong>Talk to engineers as peers, not interpreters.</strong> When you stop saying "I don't really understand the tech" and start saying "show me the JSON," your career changes within a quarter.</li>
+      </ul>
+      <p>You can do this. The skills you have — caring about clarity, structure, audience, and consistency — are exactly the skills the field is desperate for. The engineering layer is learnable, and you've just started.</p>
+      <p><em>Good luck. Go model some content.</em></p>` }
+    ]
+  }
+];
+
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const STORAGE_KEY = "content-eng-course-v1";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return {
+    currentModule: "intro",
+    completed: {},
+    activities: {},
+    selfChecks: {},
+    theme: "light"
+  };
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn("Could not save state", e);
+  }
+}
+
+let state = loadState();
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderNav() {
+  const nav = document.getElementById("nav-list");
+  let html = "";
+  let currentSection = "";
+
+  courseData.forEach((mod, idx) => {
+    const sectionLabel = mod.section.startsWith("Module") ? "Modules"
+                        : mod.section.startsWith("Appendix") ? "Appendices"
+                        : "Start here";
+    if (sectionLabel !== currentSection) {
+      currentSection = sectionLabel;
+      html += `<div class="nav-section-label">${sectionLabel}</div>`;
+    }
+    const isActive = mod.id === state.currentModule ? "active" : "";
+    const isComplete = state.completed[mod.id] ? "complete" : "";
+    html += `
+      <button class="nav-item ${isActive} ${isComplete}" data-id="${mod.id}" onclick="goTo('${mod.id}')">
+        <span class="nav-item-number">${mod.number}</span>
+        <span class="nav-item-title">${mod.title}</span>
+        <span class="nav-item-check" aria-hidden="true"></span>
+      </button>
+    `;
+  });
+
+  nav.innerHTML = html;
+}
+
+function renderProgress() {
+  const total = courseData.length;
+  const done = Object.values(state.completed).filter(Boolean).length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById("progress-pct").textContent = pct + "%";
+  document.getElementById("progress-fill").style.width = pct + "%";
+}
+
+function escapeAttr(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+function renderLesson() {
+  const mod = courseData.find(m => m.id === state.currentModule);
+  if (!mod) return;
+
+  document.getElementById("topbar-current").textContent = `${mod.section} · ${mod.title}`;
+
+  let html = `
+    <div class="lesson-meta">
+      <span class="lesson-meta-rule"></span>
+      <span>${mod.section}</span>
+    </div>
+    <h1 class="lesson-title">${mod.title}</h1>
+    ${mod.intro ? `<p class="lesson-intro">${mod.intro}</p>` : ""}
+    <div class="prose">
+  `;
+
+  mod.sections.forEach((sec, i) => {
+    if (sec.type === "head") {
+      html += `<h2 class="section-head">${sec.num ? `<span class="head-num">Part ${sec.num}</span>` : ""}${sec.text}</h2>`;
+    } else if (sec.type === "subhead") {
+      html += `<h3 class="subsection">${sec.text}</h3>`;
+    } else if (sec.type === "minor") {
+      html += `<h4 class="minor-head">${sec.text}</h4>`;
+    } else if (sec.type === "prose") {
+      html += sec.html;
+    } else if (sec.type === "scenario") {
+      html += `<div class="scenario"><div class="scenario-label">Real-world scenario</div>${sec.html}</div>`;
+    } else if (sec.type === "activity") {
+      const saved = state.activities[sec.id] || "";
+      const words = saved.trim() ? saved.trim().split(/\s+/).length : 0;
+      html += `
+        <div class="activity">
+          <div class="activity-header">
+            <div>
+              <div class="activity-tag">Activity ${sec.id}</div>
+              <div class="activity-title">${sec.title}</div>
+            </div>
+            <div class="activity-status">
+              <span class="save-indicator ${saved ? "saved" : ""}" id="indicator-${sec.id}"></span>
+              <span id="status-${sec.id}">${saved ? "Saved" : "Not started"}</span>
+            </div>
+          </div>
+          <div class="activity-prompt">${sec.prompt}</div>
+          <div class="activity-workspace">
+            <div class="workspace-label">
+              <span>Your workspace</span>
+              <span class="word-count" id="wc-${sec.id}">${words} word${words === 1 ? "" : "s"}</span>
+            </div>
+            <textarea
+              class="workspace-textarea"
+              data-activity="${sec.id}"
+              placeholder="${escapeAttr(sec.placeholder || "Start typing your answer...")}"
+              oninput="handleActivityInput(this)"
+            >${saved.replace(/</g, "&lt;")}</textarea>
+          </div>
+        </div>
+      `;
+    } else if (sec.type === "apply") {
+      html += `<div class="apply-callout"><div class="apply-callout-label">Apply it at work this week</div>${sec.html}</div>`;
+    } else if (sec.type === "selfcheck") {
+      html += `<div class="selfcheck"><div class="selfcheck-label">Self-check</div>`;
+      sec.questions.forEach((q, qi) => {
+        const key = `${mod.id}-${qi}`;
+        const checked = state.selfChecks[key] ? "checked" : "";
+        html += `
+          <div class="selfcheck-question ${checked}" onclick="toggleSelfCheck('${key}', this)">
+            <div class="selfcheck-checkbox"></div>
+            <div class="selfcheck-text">${q}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+  });
+
+  html += `</div>`;
+
+  const isComplete = state.completed[mod.id];
+  html += `
+    <div class="complete-cta">
+      <div class="complete-cta-text">${isComplete ? "You've marked this module complete." : "Ready to move on?"}</div>
+      <button class="btn-complete ${isComplete ? "is-complete" : ""}" onclick="toggleComplete('${mod.id}')">
+        ${isComplete ? "✓ Completed" : "Mark as complete"}
+      </button>
+    </div>
+  `;
+
+  // Prev / next
+  const idx = courseData.findIndex(m => m.id === mod.id);
+  const prev = courseData[idx - 1];
+  const next = courseData[idx + 1];
+  html += `
+    <div class="lesson-nav">
+      ${prev ? `<button class="nav-link" onclick="goTo('${prev.id}')">
+        <div class="nav-link-label">← Previous</div>
+        <div class="nav-link-title">${prev.title}</div>
+      </button>` : `<button class="nav-link" disabled><div class="nav-link-label">← Previous</div><div class="nav-link-title">Start of course</div></button>`}
+      ${next ? `<button class="nav-link next" onclick="goTo('${next.id}')">
+        <div class="nav-link-label">Next →</div>
+        <div class="nav-link-title">${next.title}</div>
+      </button>` : `<button class="nav-link next" disabled><div class="nav-link-label">Next →</div><div class="nav-link-title">End of course</div></button>`}
+    </div>
+  `;
+
+  document.getElementById("lesson").innerHTML = html;
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+function goTo(id) {
+  state.currentModule = id;
+  saveState();
+  renderNav();
+  renderLesson();
+  closeSidebar();
+}
+
+function toggleComplete(id) {
+  state.completed[id] = !state.completed[id];
+  saveState();
+  renderNav();
+  renderProgress();
+  renderLesson();
+  if (state.completed[id]) {
+    showToast("Module marked complete. Onward.");
+  }
+}
+
+function toggleSelfCheck(key, el) {
+  state.selfChecks[key] = !state.selfChecks[key];
+  el.classList.toggle("checked");
+  saveState();
+}
+
+let saveTimers = {};
+function handleActivityInput(textarea) {
+  const id = textarea.dataset.activity;
+  const value = textarea.value;
+  state.activities[id] = value;
+
+  // Update word count
+  const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+  const wcEl = document.getElementById(`wc-${id}`);
+  if (wcEl) wcEl.textContent = `${words} word${words === 1 ? "" : "s"}`;
+
+  // Update indicator
+  const indicator = document.getElementById(`indicator-${id}`);
+  const status = document.getElementById(`status-${id}`);
+  if (indicator) {
+    indicator.classList.remove("saved");
+    indicator.classList.add("saving");
+  }
+  if (status) status.textContent = "Saving…";
+
+  clearTimeout(saveTimers[id]);
+  saveTimers[id] = setTimeout(() => {
+    saveState();
+    if (indicator) {
+      indicator.classList.remove("saving");
+      indicator.classList.add("saved");
+    }
+    if (status) status.textContent = value.trim() ? "Saved" : "Not started";
+  }, 500);
+}
+
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", state.theme);
+  saveState();
+}
+
+function openSidebar() {
+  document.getElementById("sidebar").classList.add("open");
+  document.getElementById("scrim").classList.add("show");
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("scrim").classList.remove("show");
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+function exportProgress() {
+  const now = new Date();
+  const dateStr = now.toISOString().split("T")[0];
+  let md = `# Content Engineering Course — My Work\n\nExported ${now.toLocaleString()}\n\n`;
+
+  const total = courseData.length;
+  const done = Object.values(state.completed).filter(Boolean).length;
+  md += `**Progress:** ${done}/${total} modules complete (${Math.round(done/total*100)}%)\n\n---\n\n`;
+
+  courseData.forEach(mod => {
+    const isDone = state.completed[mod.id];
+    md += `## ${mod.section} — ${mod.title} ${isDone ? "✓" : ""}\n\n`;
+
+    let hasContent = false;
+
+    mod.sections.forEach(sec => {
+      if (sec.type === "activity") {
+        const ans = state.activities[sec.id];
+        if (ans && ans.trim()) {
+          hasContent = true;
+          md += `### Activity ${sec.id} — ${sec.title}\n\n`;
+          md += ans.trim() + "\n\n";
+        }
+      } else if (sec.type === "selfcheck") {
+        let scAnswered = sec.questions.map((q, qi) => state.selfChecks[`${mod.id}-${qi}`]).filter(Boolean).length;
+        if (scAnswered > 0) {
+          hasContent = true;
+          md += `### Self-check\n\n`;
+          sec.questions.forEach((q, qi) => {
+            const checked = state.selfChecks[`${mod.id}-${qi}`];
+            md += `- ${checked ? "✓" : "○"} ${q}\n`;
+          });
+          md += `\n`;
+        }
+      }
+    });
+
+    if (!hasContent && !isDone) {
+      md += `_(no work yet)_\n\n`;
+    }
+  });
+
+  const blob = new Blob([md], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `content-engineering-work-${dateStr}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast("Your work has been downloaded.");
+}
+
+function resetProgress() {
+  if (!confirm("This will erase all your progress, activity answers, and self-check marks. Are you sure?\n\nTip: Export your work first if you want a backup.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = loadState();
+  document.documentElement.setAttribute("data-theme", state.theme);
+  renderAll();
+  showToast("Progress reset.");
+}
+
+function renderAll() {
+  renderNav();
+  renderProgress();
+  renderLesson();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.documentElement.setAttribute("data-theme", state.theme);
+renderAll();
+
+// Keyboard nav
+document.addEventListener("keydown", (e) => {
+  // Don't intercept when typing in textarea/input
+  if (e.target.matches("textarea, input")) return;
+  const idx = courseData.findIndex(m => m.id === state.currentModule);
+  if (e.key === "ArrowRight" && idx < courseData.length - 1) {
+    goTo(courseData[idx + 1].id);
+  } else if (e.key === "ArrowLeft" && idx > 0) {
+    goTo(courseData[idx - 1].id);
+  }
+});
+</script>
+</body>
+</html>
